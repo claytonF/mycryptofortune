@@ -1,0 +1,33 @@
+<table>
+  <thead>
+    <tr>
+      <th>Asset</th>
+      <th>Amount held</th>
+      <th>Value (USD)</th>
+      <th>Value (GBP)</th>
+      <th>Profit</th>
+      <th>Wallet Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let asset of assetData" >
+      <td>{{asset.name}}</td>
+      <td><input value={{asset.held}} /></td>
+      <td>${{asset.value_usd | number : '1.2-2'}}</td>
+      <td>£{{asset.value_gbp | number : '1.2-2'}}</td>
+      <td>£{{asset.profit_gbp | number : '1.2-2'}}</td>
+      <td>{{asset.walletLocation}}</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>TOTAL</td>
+      <td></td>
+      <td><strong>${{totalValueUsd | number : '1.2-2'}}</strong></td>
+      <td><strong>£{{totalValueGbp | number : '1.2-2'}}</strong></td>
+      <td><strong>£{{totalProfit | number : '1.2-2'}}</strong></td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+<button (click)="refreshDate()">Refresh</button>
