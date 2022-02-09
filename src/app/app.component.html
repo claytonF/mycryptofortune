@@ -11,12 +11,12 @@
   </thead>
   <tbody>
     <tr *ngFor="let asset of assetData" >
-      <td>{{asset.name}}</td>
-      <td><input value={{asset.held}} /></td>
+      <td>{{asset.asset_name}}</td>
+      <td><input value={{asset.asset_held}} /></td>
       <td>${{asset.value_usd | number : '1.2-2'}}</td>
       <td>£{{asset.value_gbp | number : '1.2-2'}}</td>
       <td>£{{asset.profit_gbp | number : '1.2-2'}}</td>
-      <td>{{asset.walletLocation}}</td>
+      <td>{{asset.asset_wallet}}</td>
     </tr>
   </tbody>
   <tfoot>
@@ -31,3 +31,24 @@
   </tfoot>
 </table>
 <button (click)="refreshDate()">Refresh</button>
+<form  [formGroup]="formdata" (ngSubmit) = "onClickSubmit(formdata.value)">
+  <label>Abbreviation</label>
+  <select (ngModelChange)="assetName($event)" type="select" class="fortextbox" name="asset_abbrev"  
+  formControlName="asset_abbrev">
+    <option>Select coin</option>
+    <option value="{{asset.symbol}}" *ngFor="let asset of asset_list">{{asset.symbol}} ({{asset.name}})</option>
+  </select>
+  <label>Name</label>
+  <input type = "text" class = "fortextbox" name = "asset_name" placeholder = "asset name" 
+  formControlName="asset_name" />
+  <label>held</label>
+  <input type = "text" class = "fortextbox" name = "asset_held" placeholder = "quantity held" 
+  formControlName="asset_held" />
+  <label>invested</label>
+  <input type = "text" class = "fortextbox" name = "asset_invested" placeholder = "£ invested" 
+  formControlName="asset_invested" />
+  <label>wallet</label>
+  <input type = "text" class = "fortextbox" name = "asset_wallet" placeholder = "asset wallet" 
+  formControlName="asset_wallet" />
+  <input type="submit" value="add asset" />
+</form>
