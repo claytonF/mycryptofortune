@@ -1,0 +1,134 @@
+header {
+	padding: 10px;
+	margin: 10px;
+	text-align: center;
+
+	h1 {
+			font-size: 5rem;
+			margin: 0rem;
+			font-weight: bolder;
+	}
+	.refresh {
+		margin: auto;
+		font-weight: bold;
+
+		i {
+			margin: 0 0 0 1rem;
+			cursor: pointer;
+		}
+	}
+}
+.card-container {
+	display: flex;
+	flex-direction: row;
+	width: 500px;
+
+	.asset {
+		position: relative;
+		width: 100%;
+		perspective: 1000px;
+		margin-right: 20px;
+
+		.asset-data-container {
+			width:500px;
+			height: 400px;
+			transition: transform 0.6s;
+			transform-style: preserve-3d;
+
+			.asset-data {
+				position: absolute;
+				background: #F9B4A6;
+				width: 100%;
+				height: 100%;
+				border: 2px solid #000000;
+				box-sizing: border-box;
+				box-shadow: 0px 5px 0px #000000;
+				border-radius: 5px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-content:center;
+				-webkit-backface-visibility: hidden;
+				backface-visibility: hidden;
+
+				h4 {
+					text-align: center;
+					margin: 1rem 0;
+					font-weight: bold;
+				}
+				.profit-container {
+					width: 200px;
+					height: 200px;
+					left: 193px;
+					top: 82px;
+					border-radius: 100px;
+					background: #000000;
+					color: white;
+					text-align: center;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					margin: auto;
+				}
+
+				.meta-data {
+					list-style-type: none;
+					padding-left: 0;
+					display: flex;
+					flex-direction: row;
+					justify-content: space-evenly;
+					margin-top: 1rem;
+
+					li {
+						text-align: center;
+						h5 {
+							font-weight: bold;
+						}
+					}
+				}
+
+				.wallet {
+					text-align: center;
+				}
+
+				.asset-actions {
+					position: absolute;
+					top: 10px;
+					right: 10px;
+					display: flex;
+					flex-direction: row;
+
+					.edit-asset, .delete-asset {
+						width: 20px;
+						height: 20px;
+						cursor: pointer;
+						margin: 0 0 0 5px;
+					}
+				}
+			}
+			.edit_asset {
+				position: absolute;
+				background: #F9B4A6;
+				border: 2px solid #000000;
+				box-sizing: border-box;
+				//box-shadow: 5px 5px 0px #000000;
+				border-radius: 5px;
+				width: 500px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-content:center;
+				-webkit-backface-visibility: hidden;
+				backface-visibility: hidden;
+				transform: rotateY(180deg);
+				width: 100%;
+				height: 100%;
+			}
+		}
+		
+	}
+}
+
+.asset:hover .asset-data-container {
+  transform: rotateY(180deg);
+}

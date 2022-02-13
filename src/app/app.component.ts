@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
   totalValueGbp: any = 0;
   totalProfit: any = 0;
   formdata:any;
+  editAssetformdata: any;
   asset_abbrev: any;
   asset_name: any;
   asset_held: any;
@@ -34,7 +35,6 @@ export class AppComponent implements OnInit {
   asset_invested: any;
   storedCurrenciesString: any;
   asset_list: any = [];
-
   endpoint: any = 'https://data.messari.io/api/v1/assets';
   storedCurrencies: any = [];
   fixerEndpoint: string = `http://data.fixer.io/api/latest?access_key=${environment.access_key}&format=1&symbols=USD,GBP`
@@ -51,24 +51,38 @@ export class AppComponent implements OnInit {
         asset_name: new FormControl(),
         asset_held: new FormControl(),
         asset_wallet: new FormControl(),
-        asset_invested: new FormControl()
+        asset_invested: new FormControl(),
+        asset_sort_order: new FormControl(),
      });
+     this.editAssetformdata = new FormGroup({
+      asset_abbrev: new FormControl(),
+      asset_name: new FormControl(),
+      asset_held: new FormControl(),
+      asset_wallet: new FormControl(),
+      asset_invested: new FormControl(),
+      asset_sort_order: new FormControl(),
+    });
     }
   
   
   refreshDate() {
+    console.log('hello')
     this.resetData();
     this.storedCurrenciesString = localStorage.getItem('assetData');
     let tempAssetData = []
     tempAssetData.push(JSON.parse(this.storedCurrenciesString));
     this.assetData = tempAssetData[0];
+    console.log(this.assetData);
+    console.log(this.storedCurrenciesString);
     if(this.storedCurrenciesString) {
+      console.log('test again')
       this.calculateTotals(this.assetData);
     }
   }
 
   calculateAssetData(data:any) {
     let currency = data;
+    console.log(currency);
     console.log(this.fixerEndpoint);
     this.getFiatRate(this.fixerEndpoint).subscribe((res: any) => {
       this.FiatValues.push(res.rates);
@@ -76,23 +90,24 @@ export class AppComponent implements OnInit {
         this.interimValues.push(1 / value);
       }
       this.exchange = this.interimValues[1] / this.interimValues[0];
-        this.getCryptoData(this.endpoint, currency.asset_abbrev).subscribe((res:any) => {
-          if(res.data) {
-            currency.price_usd = res.data.market_data.price_usd;
-            currency.price_gbp = res.data.market_data.price_usd / this.exchange;
-            currency.value_gbp = currency.price_gbp * currency.asset_held;
-            currency.value_usd = currency.price_usd * currency.asset_held;
-            currency.profit_gbp = currency.value_gbp - currency.asset_invested;
-            console.log(currency);
-            this.assetData = this.assetData || [];
-            this.assetData.push(currency);
-            let tempCurrency = JSON.stringify(this.assetData);
-            localStorage.setItem('assetData', tempCurrency);
-            this.calculateTotals(this.assetData);
-          } else {
-            console.log("rate limit exceeded");
-          }
-        });
+      this.getCryptoData(this.endpoint, currency.asset_abbrev).subscribe((res:any) => {
+        if(res.data) {
+          currency.asset_name = res.data.slug;
+          currency.price_usd = res.data.market_data.price_usd;
+          currency.price_gbp = res.data.market_data.price_usd / this.exchange;
+          currency.value_gbp = currency.price_gbp * currency.asset_held;
+          currency.value_usd = currency.price_usd * currency.asset_held;
+          currency.profit_gbp = currency.value_gbp - currency.asset_invested;
+          this.assetData = this.assetData || [];
+          this.assetData.push(currency);
+          this.assetData.sort((a:any, b:any) => parseFloat(a.asset_sort_order) - parseFloat(b.asset_sort_order));
+          let tempCurrency = JSON.stringify(this.assetData);
+          localStorage.setItem('assetData', tempCurrency);
+          this.calculateTotals(this.assetData);
+        } else {
+          console.log("rate limit exceeded");
+        }
+      });
     });
 
   }
@@ -106,8 +121,7 @@ export class AppComponent implements OnInit {
       tempAssetList.forEach((asset:any) => {
         this.asset_list.push({'symbol': asset.symbol, 'name': asset.name});
         return this.asset_list;
-
-      })
+      });
     });
   }
   getFiatRate(endpoint:any) {
@@ -127,18 +141,53 @@ export class AppComponent implements OnInit {
   }
 
   onClickSubmit(data:any) {
-    console.log(data);
     this.calculateAssetData(data);
  }
 
   calculateTotals(assets:any) {
+    this.totalValueUsd = 0;
+    this.totalValueGbp = 0;
+    this.totalProfit = 0;
     assets.forEach((asset:any) => {
-      console.log(asset);
       this.totalValueUsd = this.totalValueUsd + asset.value_usd;
       this.totalValueGbp = this.totalValueGbp + asset.value_gbp;
       this.totalProfit = this.totalProfit + asset.profit_gbp;
-      console.log(this.totalProfit);
 
     })
+  }
+
+  setEditAssetFormData(assetData:any) {
+    this.editAssetformdata.controls['asset_held'].setValue(assetData.asset_held)
+    this.editAssetformdata.controls['asset_invested'].setValue(assetData.asset_invested)
+    this.editAssetformdata.controls['asset_wallet'].setValue(assetData.asset_wallet)
+    this.editAssetformdata.controls['asset_abbrev'].setValue(assetData.asset_abbrev)
+    this.editAssetformdata.controls['asset_name'].setValue(assetData.asset_name)
+    this.editAssetformdata.controls['asset_sort_order'].setValue(assetData.asset_sort_order)
+  }
+
+  updateAsset(data:any) {
+    let tempAssetData:any = []
+    tempAssetData.push(JSON.parse(this.storedCurrenciesString));
+    let updatedAssetIndex = this.assetData.findIndex(
+      (asset:any) => asset.asset_abbrev === data.asset_abbrev
+    )
+    this.assetData.splice(updatedAssetIndex, 1);
+    let tempCurrency = JSON.stringify(this.assetData);
+    localStorage.setItem('assetData', tempCurrency);
+    this.calculateAssetData(data);
+    this.refreshDate(); 
+  }
+
+  deleteAsset(data:any) {
+    let tempAssetData:any = []
+    tempAssetData.push(JSON.parse(this.storedCurrenciesString));
+    let updatedAssetIndex = this.assetData.findIndex(
+      (asset:any) => asset.asset_abbrev === data.asset_abbrev
+    )
+    this.assetData.splice(updatedAssetIndex, 1);
+    let tempCurrency = JSON.stringify(this.assetData);
+    localStorage.setItem('assetData', tempCurrency);
+    this.resetData();
+    this.refreshDate();
   }
 }
