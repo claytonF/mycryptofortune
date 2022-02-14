@@ -9,10 +9,9 @@
 <div class="card-container">
   <div class="asset" *ngFor="let asset of assetData">
     <div class="asset-data-container">
-      <div class="asset-data">
+      <div class="asset-data card">
         <div class="asset-actions">
-          <div class="edit-asset" (click)="setEditAssetFormData(asset)"><i class="fi fi-rr-edit"></i></div>
-          <div class="delete-asset" (click)="deleteAsset(asset)"><i class="fi fi-rr-trash"></i></div>
+          <div class="edit-asset" (click)="setEditAssetFormData(asset, $event)"><i class="fi fi-rr-edit"></i></div>
         </div>
         <h4>{{asset.asset_name}} ({{asset.asset_abbrev}})</h4>
         <div class="profit-container">
@@ -28,7 +27,12 @@
         </ul>
         <div class="wallet">Wallet: {{asset.asset_wallet}}</div>
       </div>
-      <div class="edit_asset">
+      <div class="edit_asset card">
+        <div class="asset-actions">
+          <div class="cancel-edit" (click)="cancelEditAssetFormData($event)"><i class="fi fi-rr-cross"></i></div>
+          <div class="delete-asset" (click)="deleteAsset(asset)"><i class="fi fi-rr-trash"></i></div>
+        </div>
+        <h4>{{asset.asset_name}} ({{asset.asset_abbrev}})</h4>
         <form  [formGroup]="editAssetformdata" (ngSubmit) = "updateAsset(editAssetformdata.value)">
           <div>
           <label>held</label>
@@ -45,37 +49,40 @@
           <input type="text" class="fortextbox" name="asset_wallet" value="{{asset.asset_wallet}}"
           formControlName="asset_wallet" />
         </div>
-          <input type="text" class="fortextbox" name="asset_abbrev" value="{{asset.asset_abbrev}}" 
+          <input type="hidden" class="fortextbox" name="asset_abbrev" value="{{asset.asset_abbrev}}" 
           formControlName="asset_abbrev">
-          <input type="number" class="fortextbox" name="asset_sort_order" value="{{asset.asset_sort_order}}" 
+          <input type="hidden" class="fortextbox" name="asset_sort_order" value="{{asset.asset_sort_order}}" 
           formControlName="asset_sort_order">
           <input type="submit" value="update" />
         </form>
       </div>
     </div>
   </div>
-
-  <div class="add_asset">
-    <h3>Add asset</h3>
-    <form  [formGroup]="formdata" (ngSubmit) = "onClickSubmit(formdata.value)">
-      <label>Abbreviation</label>
-      <select type="select" class="fortextbox" name="asset_abbrev"  
-      formControlName="asset_abbrev">
-        <option>Select coin</option>
-        <option value="{{asset.symbol}}" *ngFor="let asset of asset_list">{{asset.symbol}} ({{asset.name}})</option>
-      </select>
-      <label>held</label>
-      <input type = "number" class = "fortextbox" name = "asset_held" placeholder = "quantity held" 
-      formControlName="asset_held" />
-      <label>invested</label>
-      <input type = "number" class = "fortextbox" name = "asset_invested" placeholder = "£ invested" 
-      formControlName="asset_invested" />
-      <label>wallet</label>
-      <input type = "text" class = "fortextbox" name = "asset_wallet" placeholder = "asset wallet" 
-      formControlName="asset_wallet" />
-      <input type = "number" class = "fortextbox" name = "asset_sort_order" placeholder = "sort order" 
-      formControlName="asset_sort_order" />
-      <input type="submit" value="add asset" />
-    </form>
+  <div class="asset">
+    <div class="asset-data-container">
+      <div class="add_asset card">
+        <h3>Add asset</h3>
+        <form  [formGroup]="formdata" (ngSubmit) = "onClickSubmit(formdata.value)">
+          <label>Abbreviation</label>
+          <select type="select" class="fortextbox" name="asset_abbrev"  
+          formControlName="asset_abbrev">
+            <option>Select coin</option>
+            <option value="{{asset.symbol}}" *ngFor="let asset of asset_list">{{asset.symbol}} ({{asset.name}})</option>
+          </select>
+          <label>held</label>
+          <input type = "number" class = "fortextbox" name = "asset_held" placeholder = "quantity held" 
+          formControlName="asset_held" />
+          <label>invested</label>
+          <input type = "number" class = "fortextbox" name = "asset_invested" placeholder = "£ invested" 
+          formControlName="asset_invested" />
+          <label>wallet</label>
+          <input type = "text" class = "fortextbox" name = "asset_wallet" placeholder = "asset wallet" 
+          formControlName="asset_wallet" />
+          <input type = "number" class = "fortextbox" name = "asset_sort_order" placeholder = "sort order" 
+          formControlName="asset_sort_order" />
+          <input type="submit" value="add asset" />
+        </form>
+      </div>
+    </div>
   </div>
 </div>

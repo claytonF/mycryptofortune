@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { environment } from './../environments/environment';
+import { Renderer2 } from '@angular/core';
 // import 'rxjs/add/operator/catch';
 
 // Interfaces
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private render:Renderer2
     ) { }
 
     ngOnInit() {
@@ -156,13 +158,18 @@ export class AppComponent implements OnInit {
     })
   }
 
-  setEditAssetFormData(assetData:any) {
-    this.editAssetformdata.controls['asset_held'].setValue(assetData.asset_held)
-    this.editAssetformdata.controls['asset_invested'].setValue(assetData.asset_invested)
-    this.editAssetformdata.controls['asset_wallet'].setValue(assetData.asset_wallet)
-    this.editAssetformdata.controls['asset_abbrev'].setValue(assetData.asset_abbrev)
-    this.editAssetformdata.controls['asset_name'].setValue(assetData.asset_name)
-    this.editAssetformdata.controls['asset_sort_order'].setValue(assetData.asset_sort_order)
+  setEditAssetFormData(assetData:any, event:any) {
+    this.editAssetformdata.controls['asset_held'].setValue(assetData.asset_held);
+    this.editAssetformdata.controls['asset_invested'].setValue(assetData.asset_invested);
+    this.editAssetformdata.controls['asset_wallet'].setValue(assetData.asset_wallet);
+    this.editAssetformdata.controls['asset_abbrev'].setValue(assetData.asset_abbrev);
+    this.editAssetformdata.controls['asset_name'].setValue(assetData.asset_name);
+    this.editAssetformdata.controls['asset_sort_order'].setValue(assetData.asset_sort_order);
+    this.flipCard(event);
+  }
+
+  cancelEditAssetFormData(event:any) {
+    this.flipCardBack (event);
   }
 
   updateAsset(data:any) {
@@ -189,5 +196,16 @@ export class AppComponent implements OnInit {
     localStorage.setItem('assetData', tempCurrency);
     this.resetData();
     this.refreshDate();
+  }
+
+  flipCard(event:any) {
+    let nodeList = document.querySelectorAll('.asset');
+    nodeList.forEach((node) => {
+      node.className = 'asset';
+    })
+    this.render.addClass(event.target.parentElement.parentElement.parentElement.parentElement.parentElement,"asset-flip");
+  }
+  flipCardBack(event:any) {
+    this.render.removeClass(event.target.parentElement.parentElement.parentElement.parentElement.parentElement,"asset-flip");
   }
 }

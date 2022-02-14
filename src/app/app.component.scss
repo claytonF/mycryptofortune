@@ -1,6 +1,6 @@
 header {
 	padding: 10px;
-	margin: 10px;
+	margin: 0;
 	text-align: center;
 
 	h1 {
@@ -21,7 +21,24 @@ header {
 .card-container {
 	display: flex;
 	flex-direction: row;
-	width: 500px;
+	padding-bottom: 20px;
+	margin-left: 20px;
+	overflow-y: scroll;
+
+	.card {
+		background: #F9B4A6;
+		width: 100%;
+		height: 100%;
+		border: 2px solid #000000;
+		box-sizing: border-box;
+		box-shadow: 0px 5px 0px #000000;
+		border-radius: 5px;
+	}
+	h4 {
+		text-align: center;
+		margin: 1rem 0;
+		font-weight: bold;
+	}
 
 	.asset {
 		position: relative;
@@ -37,13 +54,6 @@ header {
 
 			.asset-data {
 				position: absolute;
-				background: #F9B4A6;
-				width: 100%;
-				height: 100%;
-				border: 2px solid #000000;
-				box-sizing: border-box;
-				box-shadow: 0px 5px 0px #000000;
-				border-radius: 5px;
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
@@ -51,11 +61,6 @@ header {
 				-webkit-backface-visibility: hidden;
 				backface-visibility: hidden;
 
-				h4 {
-					text-align: center;
-					margin: 1rem 0;
-					font-weight: bold;
-				}
 				.profit-container {
 					width: 200px;
 					height: 200px;
@@ -90,45 +95,56 @@ header {
 				.wallet {
 					text-align: center;
 				}
-
-				.asset-actions {
-					position: absolute;
-					top: 10px;
-					right: 10px;
-					display: flex;
-					flex-direction: row;
-
-					.edit-asset, .delete-asset {
-						width: 20px;
-						height: 20px;
-						cursor: pointer;
-						margin: 0 0 0 5px;
-					}
-				}
 			}
 			.edit_asset {
 				position: absolute;
-				background: #F9B4A6;
-				border: 2px solid #000000;
-				box-sizing: border-box;
-				//box-shadow: 5px 5px 0px #000000;
-				border-radius: 5px;
 				width: 500px;
 				display: flex;
 				flex-direction: column;
-				justify-content: center;
 				align-content:center;
 				-webkit-backface-visibility: hidden;
 				backface-visibility: hidden;
 				transform: rotateY(180deg);
 				width: 100%;
 				height: 100%;
+
+				form div {
+					display: flex;
+					flex-direction: column;
+					width: 100px;
+					align-content: center;
+					text-align: center;
+					margin: 0 auto 20px auto;
+
+					input {
+						border: 1px solid black;
+						border-radius: 5px;
+					}
+				}
+			}
+
+			.asset-actions {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				display: flex;
+				flex-direction: row;
+
+				div {
+					cursor: pointer;
+				}
+
+				.edit-asset, .delete-asset {
+					width: 20px;
+					height: 20px;
+					margin: 0 0 0 5px;
+				}
 			}
 		}
 		
 	}
 }
 
-.asset:hover .asset-data-container {
+.asset-flip .asset-data-container {
   transform: rotateY(180deg);
 }
