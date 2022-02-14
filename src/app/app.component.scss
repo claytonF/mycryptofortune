@@ -21,7 +21,7 @@ header {
 .card-container {
 	display: flex;
 	flex-direction: row;
-	padding-bottom: 20px;
+	padding: 50px 0 20px;
 	margin-left: 20px;
 	overflow-y: scroll;
 
@@ -67,13 +67,18 @@ header {
 					left: 193px;
 					top: 82px;
 					border-radius: 100px;
-					background: #000000;
 					color: white;
 					text-align: center;
 					display: flex;
 					justify-content: center;
 					align-items: center;
 					margin: auto;
+				}
+				.profit {
+					background: #000000;
+				}
+				.loss {
+					background: #924545;
 				}
 
 				.meta-data {
@@ -121,6 +126,32 @@ header {
 						border-radius: 5px;
 					}
 				}
+				.edit-submit {
+					border: 2px solid black;
+					border-radius: 5px;
+					background: none;
+					display: block;
+					margin: auto;
+					padding: 10px;
+					box-shadow: 0px 2px 0px #000000;
+				}
+				.edit-submit:hover {
+					background-color: #F28F80;
+					box-shadow: 0px 0px 0px #000000;
+				}
+
+				.delete-asset {
+					margin: 10px;
+					width: 50px;
+					height: 30px;
+					padding: 10px;
+					cursor: pointer;
+				}
+			}
+
+			.add_asset {
+				display: flex;
+				flex-direction: column;
 			}
 
 			.asset-actions {
@@ -134,7 +165,7 @@ header {
 					cursor: pointer;
 				}
 
-				.edit-asset, .delete-asset {
+				.edit-asset {
 					width: 20px;
 					height: 20px;
 					margin: 0 0 0 5px;
