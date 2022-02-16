@@ -35,6 +35,9 @@ export class AppComponent implements OnInit {
   asset_wallet: any;
   asset_invested: any;
   storedCurrenciesString: any;
+  currentProfit:any;
+  previousProfit: any;
+  profitDifference: any;
   asset_list: any = [];
   endpoint: any = 'https://data.messari.io/api/v1/assets';
   storedCurrencies: any = [];
@@ -68,16 +71,13 @@ export class AppComponent implements OnInit {
   
   
   refreshDate() {
-    console.log('hello')
+    this.currentProfit = localStorage.getItem('previousProfit');
     this.resetData();
     this.storedCurrenciesString = localStorage.getItem('assetData');
     let tempAssetData = []
     tempAssetData.push(JSON.parse(this.storedCurrenciesString));
     this.assetData = tempAssetData[0];
-    console.log(this.assetData);
-    console.log(this.storedCurrenciesString);
     if(this.storedCurrenciesString) {
-      console.log('test again')
       this.calculateTotals(this.assetData);
     }
   }
@@ -106,6 +106,8 @@ export class AppComponent implements OnInit {
           let tempCurrency = JSON.stringify(this.assetData);
           localStorage.setItem('assetData', tempCurrency);
           this.calculateTotals(this.assetData);
+          this.resetEditForm();
+          this.resetAddForm();
         } else {
           console.log("rate limit exceeded");
         }
@@ -130,11 +132,6 @@ export class AppComponent implements OnInit {
     return this.http.get(endpoint);
   }
 
-  assetName(value: string) {
-    console.log(value);
-
-  }
-
   resetData() {
     this.assetData = [];
     this.totalValueUsd = 0;
@@ -154,7 +151,8 @@ export class AppComponent implements OnInit {
       this.totalValueUsd = this.totalValueUsd + asset.value_usd;
       this.totalValueGbp = this.totalValueGbp + asset.value_gbp;
       this.totalProfit = this.totalProfit + asset.profit_gbp;
-
+      localStorage.setItem('previousProfit', this.totalProfit);
+      this.calculateProfitDifference();
     })
   }
 
@@ -207,5 +205,16 @@ export class AppComponent implements OnInit {
   }
   flipCardBack(event:any) {
     this.render.removeClass(event.target.parentElement.parentElement.parentElement.parentElement.parentElement,"asset-flip");
+  }
+
+  resetEditForm() {
+    this.editAssetformdata.reset();
+  }
+  resetAddForm() {
+    this.formdata.reset();
+  }
+
+  calculateProfitDifference() {
+    this.profitDifference = parseFloat(this.totalProfit) - parseFloat(this.currentProfit);
   }
 }

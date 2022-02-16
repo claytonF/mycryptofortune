@@ -2,7 +2,7 @@
   <p>profit<sup>*</sup></p>
   <h1>£{{totalProfit | number : '1.2-2'}}</h1>
   <p>Total value of assets £{{totalValueGbp | number : '1.2-2'}}</p>
-  <div class="refresh" (click)="refreshDate()">Up by £2.34 since you last checked<i class="fi fi-rr-refresh"></i></div>
+  <div class="refresh" (click)="refreshDate()">{{profitDifference >= 0 ? 'up' : 'down'}} by £{{profitDifference | number : '1.2-2'}} since you last checked<i class="fi fi-rr-refresh"></i></div>
   
 </header>
 
@@ -11,7 +11,7 @@
     <div class="asset-data-container">
       <div class="asset-data card">
         <div class="asset-actions">
-          <div class="edit-asset" (click)="setEditAssetFormData(asset, $event)"><i class="fi fi-rr-edit"></i></div>
+          <div class="edit-asset-btn" (click)="setEditAssetFormData(asset, $event)"><i class="fi fi-rr-edit"></i></div>
         </div>
         <h4>{{asset.asset_name}} ({{asset.asset_abbrev}})</h4>
         <div class="profit-container" [ngClass]="asset.profit_gbp > 0 ? 'profit' : 'loss'" >
@@ -27,7 +27,7 @@
         </ul>
         <div class="wallet">Wallet: {{asset.asset_wallet}}</div>
       </div>
-      <div class="edit_asset card">
+      <div class="edit-asset card">
         <div class="asset-actions">
           <div class="cancel-edit" (click)="cancelEditAssetFormData($event)"><i class="fi fi-rr-cross"></i></div>
         </div>
@@ -52,7 +52,7 @@
           formControlName="asset_abbrev">
           <input type="hidden" class="fortextbox" name="asset_sort_order" value="{{asset.asset_sort_order}}" 
           formControlName="asset_sort_order">
-          <input class="fi fi-rr-trash edit-submit" type="submit" value="update asset" />
+          <input class="submit-btn" type="submit" value="update asset" />
           <div class="delete-asset" (click)="deleteAsset(asset)"><i class="fi fi-rr-trash"></i></div>
         </form>
       </div>
@@ -60,38 +60,45 @@
   </div>
   <div class="asset">
     <div class="asset-data-container">
-      <div class="add_asset card">
-        <h3>Add asset</h3>
+      <div class="add-asset-front card">
+        <h4>Add asset</h4>
+        <div class="add-asset-btn-container">
+          <div class="add-asset-btn" (click)="flipCard($event)"><i class="fi fi-rr-add"></i></div>
+        </div>
+      </div>
+      <div class="add-asset-back card">
+        <h4>Add asset</h4>
+        <div class="asset-actions">
+          <div class="add-asset-cancel-btn" (click)="flipCardBack($event)"><i class="fi fi-rr-cross"></i></div>
+        </div>
+        
         <form  [formGroup]="formdata" (ngSubmit) = "onClickSubmit(formdata.value)">
           <div>
-            <label>Abbreviation</label>
             <select type="select" class="fortextbox" name="asset_abbrev"  
             formControlName="asset_abbrev">
-              <option>Select coin</option>
+              <option value="" disabled selected>Select coin</option>
               <option value="{{asset.symbol}}" *ngFor="let asset of asset_list">{{asset.symbol}} ({{asset.name}})</option>
               <option value="HOT">HOT (HoloCoin)</option>
             </select>
           </div>
           <div>
-            <label>held</label>
-            <input type = "number" class = "fortextbox" name = "asset_held" placeholder = "quantity held" 
+            <input type = "number" class = "fortextbox" name = "asset_held" placeholder = "quantity you hold" 
             formControlName="asset_held" />
           </div>
           <div>
-            <label>invested</label>
-            <input type = "number" class = "fortextbox" name = "asset_invested" placeholder = "£ invested" 
+            <input type = "number" class = "fortextbox" name = "asset_invested" placeholder = "£ you have invested" 
             formControlName="asset_invested" />
           </div>
           <div>
-            <label>wallet</label>
-            <input type = "text" class = "fortextbox" name = "asset_wallet" placeholder = "asset wallet" 
+            <input type = "text" class = "fortextbox" name = "asset_wallet" placeholder = "asset wallet (i.e. coinbase)" 
             formControlName="asset_wallet" />
           </div>
           <div>
+            <!-- <label>sort order</label> -->
             <input type = "number" class = "fortextbox" name = "asset_sort_order" placeholder = "sort order" 
             formControlName="asset_sort_order" />
           </div>
-          <input type="submit" value="add asset" />
+          <input class="submit-btn" type="submit" value="add asset" />
         </form>
       </div>
     </div>
