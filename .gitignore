@@ -1,2 +1,6 @@
+# NativeScriptnode_modules/
+platforms/
+hooks/
+src/**/*.js
 node_modules
 src/environments

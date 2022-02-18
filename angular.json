@@ -1,7 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": "41b31c30-48cb-42e4-b4b1-c69f2df56981"
+    "analytics": "ff8d2257-d3b9-4e53-93fe-b5f55ed1f77e",
+    "defaultCollection": "@nativescript/schematics"
   },
   "version": 1,
   "newProjectRoot": "projects",
