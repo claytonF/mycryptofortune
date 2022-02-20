@@ -4,7 +4,6 @@ import { FormBuilder } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { environment } from './../environments/environment';
 import { Renderer2 } from '@angular/core';
-// import 'rxjs/add/operator/catch';
 
 // Interfaces
 interface FiatValues {
@@ -29,16 +28,16 @@ export class AppComponent implements OnInit {
   totalProfit: any = 0;
   formdata:any;
   editAssetformdata: any;
-  asset_abbrev: any;
-  asset_name: any;
-  asset_held: any;
-  asset_wallet: any;
-  asset_invested: any;
+  assetAbbrev: any;
+  assetName: any;
+  assetHeld: any;
+  assetWallet: any;
+  assetInvested: any;
   storedCurrenciesString: any;
   currentProfit:any;
   previousProfit: any;
   profitDifference: any;
-  asset_list: any = [];
+  assetList: any = [];
   endpoint: any = 'https://data.messari.io/api/v1/assets';
   storedCurrencies: any = [];
   fixerEndpoint: string = `http://data.fixer.io/api/latest?access_key=${environment.access_key}&format=1&symbols=USD,GBP`
@@ -50,81 +49,75 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
       this.getCryptoList(this.endpoint);
-      this.refreshDate();
+      this.calculateAssetData();
       this.formdata = new FormGroup({
-        asset_abbrev: new FormControl(),
-        asset_name: new FormControl(),
-        asset_held: new FormControl(),
-        asset_wallet: new FormControl(),
-        asset_invested: new FormControl(),
-        asset_sort_order: new FormControl(),
-     });
-     this.editAssetformdata = new FormGroup({
-      asset_abbrev: new FormControl(),
-      asset_name: new FormControl(),
-      asset_held: new FormControl(),
-      asset_wallet: new FormControl(),
-      asset_invested: new FormControl(),
-      asset_sort_order: new FormControl(),
-    });
+        assetAbbrev: new FormControl(),
+        assetHeld: new FormControl(),
+         assetWallet: new FormControl(),
+        assetInvested: new FormControl(),
+        assetSortOrder: new FormControl(),
+      });
+      this.editAssetformdata = new FormGroup({
+        assetAbbrev: new FormControl(),
+        assetName: new FormControl(),
+        assetHeld: new FormControl(),
+         assetWallet: new FormControl(),
+        assetInvested: new FormControl(),
+        assetSortOrder: new FormControl(),
+      });
     }
   
   
   refreshDate() {
     this.currentProfit = localStorage.getItem('previousProfit');
-    this.resetData();
-    this.storedCurrenciesString = localStorage.getItem('assetData');
-    let tempAssetData = []
-    tempAssetData.push(JSON.parse(this.storedCurrenciesString));
-    this.assetData = tempAssetData[0];
-    if(this.storedCurrenciesString) {
-      this.calculateTotals(this.assetData);
-    }
+    this.calculateAssetData();
+
   }
 
-  calculateAssetData(data:any) {
-    let currency = data;
-    console.log(currency);
-    console.log(this.fixerEndpoint);
+  calculateAssetData() {
+    this.resetData();
+    let assets:any = this.getAssetsFromLocalStorage();
+    let jsonAssets = JSON.parse(assets);
     this.getFiatRate(this.fixerEndpoint).subscribe((res: any) => {
       this.FiatValues.push(res.rates);
       for (const [key, value] of Object.entries(this.FiatValues[0])) {
         this.interimValues.push(1 / value);
       }
       this.exchange = this.interimValues[1] / this.interimValues[0];
-      this.getCryptoData(this.endpoint, currency.asset_abbrev).subscribe((res:any) => {
-        if(res.data) {
-          currency.asset_name = res.data.slug;
-          currency.price_usd = res.data.market_data.price_usd;
-          currency.price_gbp = res.data.market_data.price_usd / this.exchange;
-          currency.value_gbp = currency.price_gbp * currency.asset_held;
-          currency.value_usd = currency.price_usd * currency.asset_held;
-          currency.profit_gbp = currency.value_gbp - currency.asset_invested;
-          this.assetData = this.assetData || [];
-          this.assetData.push(currency);
-          this.assetData.sort((a:any, b:any) => parseFloat(a.asset_sort_order) - parseFloat(b.asset_sort_order));
-          let tempCurrency = JSON.stringify(this.assetData);
-          localStorage.setItem('assetData', tempCurrency);
-          this.calculateTotals(this.assetData);
-          this.resetEditForm();
-          this.resetAddForm();
-        } else {
-          console.log("rate limit exceeded");
-        }
+      jsonAssets.forEach((currency:any) => {
+        this.getCryptoData(this.endpoint, currency.assetAbbrev).subscribe((res:any) => {
+          if(res.data) {
+            currency.assetName = res.data.slug;
+            currency.priceUsd = res.data.market_data.price_usd;
+            currency.priceGbp = res.data.market_data.price_usd / this.exchange;
+            currency.valueGbp = currency.priceGbp * currency.assetHeld;
+            currency.valueUsd = currency.priceUsd * currency.assetHeld;
+            currency.profitGbp = currency.valueGbp - currency.assetInvested;
+            this.assetData = this.assetData || [];
+            this.assetData.push(currency);
+            this.assetData.sort((a:any, b:any) => parseFloat(a.assetSortOrder) - parseFloat(b.assetSortOrder));
+            console.log(this.assetData);
+            this.calculateTotals(this.assetData);
+            this.resetEditForm();
+            this.resetAddForm();
+          } else {
+            console.log("rate limit exceeded");
+          }
+        });
       });
     });
-
   }
 
   getCryptoData(endpoint:any, currency: any) {
     return this.http.get(endpoint + '/' + currency + '/metrics');
   }
+
   getCryptoList(endpoint:any) {
     return this.http.get(endpoint).subscribe((res:any) => {
       let tempAssetList = res.data;
       tempAssetList.forEach((asset:any) => {
-        this.asset_list.push({'symbol': asset.symbol, 'name': asset.name});
-        return this.asset_list;
+        this.assetList.push({'symbol': asset.symbol, 'name': asset.name});
+        return this.assetList;
       });
     });
   }
@@ -139,30 +132,51 @@ export class AppComponent implements OnInit {
     this.totalProfit = 0;
   }
 
-  onClickSubmit(data:any) {
-    this.calculateAssetData(data);
+  addAsset(data:any, event:any) {
+    this.saveAssetsToLocalStorage(data)
+    this.calculateAssetData();
+    this.flipCardBack(event);
  }
+
+  saveAssetsToLocalStorage(asset:any) {
+    let assetsFromLocalStorage:any  = this.getAssetsFromLocalStorage();
+    let jsonAssets = JSON.parse(assetsFromLocalStorage);
+    let tempAssetList:any = [];
+    if (assetsFromLocalStorage !== null) {
+      jsonAssets.forEach((asset:any) => {
+        tempAssetList.push(asset);
+      })
+      tempAssetList.push(asset); 
+    } else {
+      tempAssetList.push(asset); 
+    }
+    localStorage.setItem('assetData', JSON.stringify(tempAssetList));
+  }
+
+  getAssetsFromLocalStorage() {
+    return localStorage.getItem('assetData');
+  }
 
   calculateTotals(assets:any) {
     this.totalValueUsd = 0;
     this.totalValueGbp = 0;
     this.totalProfit = 0;
     assets.forEach((asset:any) => {
-      this.totalValueUsd = this.totalValueUsd + asset.value_usd;
-      this.totalValueGbp = this.totalValueGbp + asset.value_gbp;
-      this.totalProfit = this.totalProfit + asset.profit_gbp;
+      this.totalValueUsd = this.totalValueUsd + asset.valueUsd;
+      this.totalValueGbp = this.totalValueGbp + asset.valueGbp;
+      this.totalProfit = this.totalProfit + asset.profitGbp;
       localStorage.setItem('previousProfit', this.totalProfit);
       this.calculateProfitDifference();
     })
   }
 
   setEditAssetFormData(assetData:any, event:any) {
-    this.editAssetformdata.controls['asset_held'].setValue(assetData.asset_held);
-    this.editAssetformdata.controls['asset_invested'].setValue(assetData.asset_invested);
-    this.editAssetformdata.controls['asset_wallet'].setValue(assetData.asset_wallet);
-    this.editAssetformdata.controls['asset_abbrev'].setValue(assetData.asset_abbrev);
-    this.editAssetformdata.controls['asset_name'].setValue(assetData.asset_name);
-    this.editAssetformdata.controls['asset_sort_order'].setValue(assetData.asset_sort_order);
+    this.editAssetformdata.controls['assetHeld'].setValue(assetData.assetHeld);
+    this.editAssetformdata.controls['assetInvested'].setValue(assetData.assetInvested);
+    this.editAssetformdata.controls['assetWallet'].setValue(assetData.assetWallet);
+    this.editAssetformdata.controls['assetAbbrev'].setValue(assetData.assetAbbrev);
+    this.editAssetformdata.controls['assetName'].setValue(assetData.assetName);
+    this.editAssetformdata.controls['assetSortOrder'].setValue(assetData.assetSortOrder);
     this.flipCard(event);
   }
 
@@ -171,29 +185,26 @@ export class AppComponent implements OnInit {
   }
 
   updateAsset(data:any) {
-    let tempAssetData:any = []
-    tempAssetData.push(JSON.parse(this.storedCurrenciesString));
     let updatedAssetIndex = this.assetData.findIndex(
-      (asset:any) => asset.asset_abbrev === data.asset_abbrev
-    )
+      (asset:any) => asset.assetAbbrev === data.assetAbbrev
+    );
     this.assetData.splice(updatedAssetIndex, 1);
     let tempCurrency = JSON.stringify(this.assetData);
     localStorage.setItem('assetData', tempCurrency);
-    this.calculateAssetData(data);
-    this.refreshDate(); 
+    this.saveAssetsToLocalStorage(data);
+    this.calculateAssetData();
+
   }
 
   deleteAsset(data:any) {
-    let tempAssetData:any = []
-    tempAssetData.push(JSON.parse(this.storedCurrenciesString));
     let updatedAssetIndex = this.assetData.findIndex(
-      (asset:any) => asset.asset_abbrev === data.asset_abbrev
-    )
+      (asset:any) => asset.assetAbbrev === data.assetAbbrev
+    );
     this.assetData.splice(updatedAssetIndex, 1);
+    console.log(this.assetData);
     let tempCurrency = JSON.stringify(this.assetData);
     localStorage.setItem('assetData', tempCurrency);
-    this.resetData();
-    this.refreshDate();
+    this.calculateAssetData();
   }
 
   flipCard(event:any) {
@@ -218,3 +229,22 @@ export class AppComponent implements OnInit {
     this.profitDifference = parseFloat(this.totalProfit) - parseFloat(this.currentProfit);
   }
 }
+
+
+// the sequence oninit
+// all I really want to store inn LC is the list of assets - not values 
+// and caclulate prices etc oninit
+
+// when add an asset:
+// 1. Add asset abbreviation to localstorage
+// 2. retrieve all assets from localstorage and for each one calculate all asset data and save to assetData const
+
+// when init page
+// 1. retrieve all assets from localstorage and for each one calculate all asset data and save to assetData const
+
+// when delete an asset
+// 1. remove asset abbreviation for asset from localstorage
+// 2. retrieve all assets from localstorage and for each one calculate all asset data and save to assetData const
+
+// when update an asset
+// 2. retrieve all assets from localstorage and for each one calculate all asset data and save to assetData const
